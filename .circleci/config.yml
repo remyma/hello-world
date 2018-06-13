@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/repo
 
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: marem/circleci-openjdk-oc
 
     steps:
       - checkout
@@ -26,4 +26,11 @@ jobs:
       
       - store_artifacts:
           path: target/hello-world-0.1.0.jar
+
+      - deploy: 
+          command: |
+              oc login -u ${CLUSTER_USERNAME} -p ${CLUSTER_PASSWORD} ${CLUSTER_URL}
+              oc project ${PROJECT_NAME}
+              oc start-build ${APP_NAME} --from-dir=.
+
 
