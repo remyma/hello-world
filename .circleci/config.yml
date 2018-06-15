@@ -49,9 +49,9 @@ jobs:
 
             - deploy: 
                 command: |
-                    oc apply -f kubernetes/hello-world-deployment.yml
-                    oc apply -f kubernetes/hello-world-service.yml
-                    oc apply -f kubernetes/hello-world-route.yml
+                    /bin/oc apply -f kubernetes/hello-world-deployment.yml
+                    /bin/oc apply -f kubernetes/hello-world-service.yml
+                    /bin/oc apply -f kubernetes/hello-world-route.yml
             
 workflows:
     version: 2
