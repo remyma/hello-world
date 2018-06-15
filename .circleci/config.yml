@@ -45,10 +45,14 @@ jobs:
         
         docker:
             - image: marem/circleci-docker-oc
-        
+
+            
         steps:
             - checkout          
             
+            - setup_remote_docker:
+                version: 17.05.0-ce
+                
             - run:
                 command: |
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
