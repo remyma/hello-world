@@ -42,8 +42,7 @@ jobs:
                     - target/hello-world-0.1.0.jar
             
     docker-deploy:        
-        docker:
-            - image: marem/circleci-docker-oc
+        machine: true
             
         steps:
             - checkout
@@ -51,8 +50,17 @@ jobs:
             - attach_workspace:
                 at: ~/project
             
-            - setup_remote_docker:
-                version: 17.05.0-ce
+            - run:
+                name: enable ipv6
+                command: |
+                    cat <<'EOF' | sudo tee /etc/docker/daemon.json
+                    {
+                        "insecure-registries": [
+                            "${DOCKER_REGISTRY_URL}"
+                        ]
+                    }
+                    EOF
+                    sudo service docker restart
 
             - run:
                 command: |
