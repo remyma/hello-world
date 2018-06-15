@@ -51,15 +51,9 @@ jobs:
                 at: ~/project
             
             - run:
-                name: enable ipv6
+                name: Configure docker daemon
                 command: |
-                    cat <<'EOF' | sudo tee /etc/docker/daemon.json
-                    {
-                        "insecure-registries": [
-                            "${DOCKER_REGISTRY_URL}"
-                        ]
-                    }
-                    EOF
+                    echo "{\"insecure-registries\": [\"${DOCKER_REGISTRY_URL}\"]}" > daemon.json
                     sudo service docker restart
 
             - run:
