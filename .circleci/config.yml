@@ -1,6 +1,3 @@
-defaults: &defaults
-  working_directory: ~/repo
-
 version: 2
 jobs:
     build:
@@ -27,8 +24,9 @@ jobs:
             
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
+            
             - persist_to_workspace:
-                root: ~/repo
+                root: /home/circleci/project
                 paths:
                     - target/hello-world-0.1.0.jar
 
@@ -51,7 +49,7 @@ jobs:
             - checkout
 
             - attach_workspace:
-                at: ~/repo/target/
+                at: /home/circleci/project
             
             - setup_remote_docker:
                 version: 17.05.0-ce
