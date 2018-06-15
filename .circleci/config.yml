@@ -37,9 +37,9 @@ jobs:
             
             - run:
                 command: |
-                    #docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
-                    #docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
+                    docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
+                    docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
 
             - deploy: 
                 command: |
