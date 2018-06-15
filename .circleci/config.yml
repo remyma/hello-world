@@ -1,16 +1,5 @@
 version: 2
 jobs:
-    init-manawa-project:
-        docker:
-            - image: marem/circleci-openjdk-oc
-
-        steps:
-            - checkout
-            
-            - deploy: 
-                command: |
-                    sh oc-create.sh
-
     build:
         docker:
             - image: circleci/openjdk
@@ -41,7 +30,7 @@ jobs:
                 paths:
                     - target/hello-world-0.1.0.jar
             
-    docker-deploy:        
+    deploy:        
         machine: true
             
         steps:
@@ -62,37 +51,34 @@ jobs:
                     wget https://github.com/openshift/origin/releases/download/v3.9.0/openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
                     tar xvf openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
                     sudo mv openshift-origin-client-tools-v3.9.0-191fece-linux-64bit/oc /usr/bin/oc
+            
             - run:
+                name: "Create Manawa project"
                 command: |
-                    oc login -u ${CLUSTER_USERNAME} -p ${CLUSTER_PASSWORD} ${CLUSTER_URL}
+                    sh oc-create.sh
+
+            - run:
+                name: "Build and push docker image"
+                command: |
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
                     docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
                     docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
-    
-    sync-manawa:
-        docker:
-            - image: marem/circleci-openjdk-oc
-
-        steps:
-            - checkout
-            
-            - deploy: 
-                command: |
+                    
+            - run:
+                name: "Sync Kubernetes objects"
+                command:
                     oc apply -f kubernetes/hello-world-deployment.yml
                     oc apply -f kubernetes/hello-world-service.yml
                     oc apply -f kubernetes/hello-world-route.yml
+
             
 workflows:
     version: 2
     build_and_deploy:
         jobs:
-            - init-manawa-project
             - build
-            - docker-deploy:
+            - deploy:
                 requires: 
-                    - init-manawa-project
                     - build
-            - sync-manawa:
-                requires: 
-                    - docker-deploy
+
     
