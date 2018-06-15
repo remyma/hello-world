@@ -1,35 +1,42 @@
 version: 2
 jobs:
-  build:    
-    machine: true
-    working_directory: ~/repo
+    init-manawa-project:
+        docker:
+            - image: marem/circleci-openjdk-oc
 
-    docker:
-      - image: marem/circleci-openjdk-oc
+        steps:
+            - checkout
 
-    steps:
-      - checkout
+            - deploy: 
+                command: |
+                    sh oc-create.sh
 
-      - restore_cache:
-          key: circleci-hello-world-{{ checksum "pom.xml" }}
-      
-      - run: mvn dependency:go-offline
-      
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: circleci-hello-world-{{ checksum "pom.xml" }}
-      
-      - run: mvn package
-      
-      - store_test_results:
-          path: target/surefire-reports
-      
-      - store_artifacts:
-          path: target/hello-world-0.1.0.jar
+    build-sources:    
+        working_directory: ~/repo
 
-      - deploy: 
-          command: |
-              sh deploy.sh
+        docker:
+            - image: marem/circleci-openjdk-oc
+
+        steps:
+            - checkout
+
+            - restore_cache:
+                key: circleci-hello-world-{{ checksum "pom.xml" }}
+            
+            - run: mvn dependency:go-offline
+            
+            - save_cache:
+                paths:
+                    - ~/.m2
+                key: circleci-hello-world-{{ checksum "pom.xml" }}
+            
+            - run: mvn package
+            
+            - store_test_results:
+                path: target/surefire-reports
+            
+            - store_artifacts:
+                path: target/hello-world-0.1.0.jar
+
 
 
