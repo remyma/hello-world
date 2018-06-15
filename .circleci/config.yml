@@ -53,7 +53,7 @@ jobs:
             - run:
                 name: Configure docker daemon
                 command: |
-                    echo "{\"insecure-registries\": [\"${DOCKER_REGISTRY_URL}\"]}" > daemon.json
+                    echo "{\"insecure-registries\": [\"${DOCKER_REGISTRY_URL}\"]}" > /etc/docker/daemon.json
                     sudo service docker restart
 
             - run:
