@@ -1,8 +1,9 @@
+defaults: &defaults
+  working_directory: ~/repo
+
 version: 2
 jobs:
     build:
-        working_directory: ~/repo
-
         docker:
             - image: circleci/openjdk
 
@@ -32,8 +33,6 @@ jobs:
                     - target/hello-world-0.1.0.jar
 
     init-manawa-project:
-        working_directory: ~/repo
-
         docker:
             - image: marem/circleci-openjdk-oc
 
@@ -44,12 +43,9 @@ jobs:
                 command: |
                     sh oc-create.sh
             
-    docker-deploy:
-        working_directory: ~/repo
-        
+    docker-deploy:        
         docker:
             - image: marem/circleci-docker-oc
-
             
         steps:
             - checkout
@@ -67,8 +63,6 @@ jobs:
                     docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
     
     sync-manawa:
-        working_directory: ~/repo
-
         docker:
             - image: marem/circleci-openjdk-oc
 
