@@ -6,7 +6,7 @@ spec:
   template: 
     metadata:
       labels:
-        name: "hello-world"
+        app: "hello-world"
     spec:
       containers:
         - name: "hello-world"
