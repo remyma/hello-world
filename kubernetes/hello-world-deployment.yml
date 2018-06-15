@@ -6,7 +6,7 @@ spec:
   template: 
     metadata:
       labels:
-        app: "hello-world"
+        name: "hello-world"
     spec:
       containers:
         - name: "hello-world"
@@ -14,7 +14,9 @@ spec:
           ports:
             - containerPort: 80
               protocol: "TCP"
-  replicas: 1 
+  replicas: 1
+  selector:
+    app: "hello-world"
   triggers:
     - type: "ConfigChange" 
     - type: "ImageChange" 
