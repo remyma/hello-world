@@ -27,20 +27,20 @@ jobs:
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
 
-    sync-manawa:
+    init-manawa-project:
         working_directory: ~/repo
 
         docker:
             - image: marem/circleci-openjdk-oc
 
         steps:
+            - checkout
+            
             - deploy: 
                 command: |
-                    oc apply -f kubernetes/hello-world-deployment.yml
-                    oc apply -f kubernetes/hello-world-service.yml
-                    oc apply -f kubernetes/hello-world-route.yml
+                    sh oc-create.sh
             
-    deploy:
+    docker-deploy:
         working_directory: ~/repo
         
         docker:
@@ -58,16 +58,32 @@ jobs:
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
                     docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
                     docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
+    
+    sync-manawa:
+        working_directory: ~/repo
+
+        docker:
+            - image: marem/circleci-openjdk-oc
+
+        steps:
+            - checkout
+            
+            - deploy: 
+                command: |
+                    oc apply -f kubernetes/hello-world-deployment.yml
+                    oc apply -f kubernetes/hello-world-service.yml
+                    oc apply -f kubernetes/hello-world-route.yml
             
 workflows:
     version: 2
     build_and_deploy:
         jobs:
             - build
-            - sync-manawa:
+            - init-manawa-project
+            - docker-deploy:
                 requires: 
-                    - build
-            - deploy:
+                    - init-manawa-project
+            - sync-manawa:
                 requires: 
                     - sync-manawa
     
