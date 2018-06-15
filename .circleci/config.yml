@@ -1,17 +1,6 @@
 version: 2
 jobs:
     init-manawa-project:
-        docker:
-            - image: marem/circleci-openjdk-oc
-
-        steps:
-            - checkout
-
-            - deploy: 
-                command: |
-                    sh oc-create.sh
-
-    build-sources:    
         working_directory: ~/repo
 
         docker:
@@ -38,32 +27,26 @@ jobs:
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
 
-    build-docker-image:
-        working_directory: ~/repo
-        
-        docker:
-            - image: docker:17.05.0-ce-git        
-        
-        steps:
-            - checkout
+            - setup_remote_docker:
+                docker_layer_caching: true
 
-            - deploy:
+            - run:
+                name: Install Docker client
+                command: |
+                    set -x
+                    VER="17.03.0-ce"
+                    curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+                    mv /tmp/docker/* /usr/bin
+            
+            - run:
                 command: |
                     docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
                     docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
-    
-    update-manawa-project:
-        docker:
-            - image: marem/circleci-openjdk-oc
-
-        steps:
-            - checkout
 
             - deploy: 
                 command: |
                     oc apply -f kubernetes/hello-world-deployment.yml
                     oc apply -f kubernetes/hello-world-service.yml
                     oc apply -f kubernetes/hello-world-route.yml
-
-
