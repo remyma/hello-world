@@ -26,6 +26,10 @@ jobs:
             
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
+            - persist_to_workspace:
+                root: target
+                paths:
+                    - hello-world-0.1.0.jar
 
     init-manawa-project:
         working_directory: ~/repo
@@ -48,11 +52,14 @@ jobs:
 
             
         steps:
-            - checkout          
+            - checkout
+
+            - attach_workspace:
+                at: target/
             
             - setup_remote_docker:
                 version: 17.05.0-ce
-                
+
             - run:
                 command: |
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
