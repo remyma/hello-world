@@ -4,7 +4,7 @@ jobs:
         working_directory: ~/repo
 
         docker:
-            - image: marem/circleci-openjdk-oc
+            - image: circleci/openjdk
 
         steps:
             - checkout
@@ -27,13 +27,19 @@ jobs:
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
 
+            
+    deploy:
+        working_directory: ~/repo
+        
+        docker:
+            - image: marem/circleci-docker-oc
+        
+        steps:
+            - checkout
+
             - run:
                 command: |
                     sh oc-create.sh
-
-            - setup_remote_docker:
-                docker_layer_caching: true
-                version: 17.05.0-ce
             
             - run:
                 command: |
@@ -46,3 +52,13 @@ jobs:
                     oc apply -f kubernetes/hello-world-deployment.yml
                     oc apply -f kubernetes/hello-world-service.yml
                     oc apply -f kubernetes/hello-world-route.yml
+            
+workflows:
+    version: 2
+    build_and_deploy:
+        jobs:
+            - build
+            - deploy:
+                requires: 
+                    - build
+    
