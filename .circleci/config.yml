@@ -57,9 +57,16 @@ jobs:
                     sudo service docker restart
 
             - run:
+                name: Install oc client
                 command: |
+                    wget https://github.com/openshift/origin/releases/download/v3.9.0/openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
+                    tar xvf openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
+                    mv openshift-origin-client-tools-v3.9.0-191fece-linux-64bit/oc /usr/bin/oc
+            - run:
+                command: |
+                    oc login -u ${CLUSTER_USERNAME} -p ${CLUSTER_PASSWORD} ${CLUSTER_URL}
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
-                    docker login -u ${CLUSTER_USERNAME} -p ${CLUSTER_PASSWORD} ${DOCKER_REGISTRY_URL}
+                    docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
                     docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
     
     sync-manawa:
