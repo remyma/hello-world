@@ -47,11 +47,7 @@ jobs:
             - image: marem/circleci-docker-oc
         
         steps:
-            - checkout
-
-            - run:
-                command: |
-                    sh oc-create.sh
+            - checkout          
             
             - run:
                 command: |
