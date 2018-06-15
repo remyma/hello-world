@@ -38,5 +38,12 @@ jobs:
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
 
+workflows:
+    version: 2
+    deploy:
+        jobs:
+            - init-manawa-project
+            - build-sources
+        
 
 
