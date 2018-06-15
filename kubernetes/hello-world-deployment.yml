@@ -15,8 +15,6 @@ spec:
             - containerPort: 80
               protocol: "TCP"
   replicas: 1
-  selector:
-    app: "hello-world"
   triggers:
     - type: "ConfigChange" 
     - type: "ImageChange" 
