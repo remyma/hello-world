@@ -85,5 +85,5 @@ workflows:
                     - init-manawa-project
             - sync-manawa:
                 requires: 
-                    - sync-manawa
+                    - docker-deploy
     
