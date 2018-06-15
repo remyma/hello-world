@@ -11,13 +11,15 @@ jobs:
                 command: |
                     sh oc-create.sh
 
-    build-sources:
+    build-sources:    
         working_directory: ~/repo
 
         docker:
             - image: marem/circleci-openjdk-oc
 
         steps:
+            - checkout
+
             - restore_cache:
                 key: circleci-hello-world-{{ checksum "pom.xml" }}
             
@@ -35,29 +37,33 @@ jobs:
             
             - store_artifacts:
                 path: target/hello-world-0.1.0.jar
-    
-    docker-build:
-        requires: 
-            - init-manawa-project
-            - build-sources
 
+    build-docker-image:
+        working_directory: ~/repo
+        
         docker:
-            - image: docker:17.05.0-ce-git
+            - image: docker:17.05.0-ce-git        
+        
         steps:
+            - checkout
+
             - deploy:
                 command: |
-                    docker login -u ${CLUSTER_USERNAME} -p (oc whoami -t) ${DOCKER_REGISTRY_URL}
+                    docker login -u ${CLUSTER_USERNAME} -p $(oc whoami -t) ${DOCKER_REGISTRY_URL}
                     docker build -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest .
                     docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}/hello-world:latest
+    
+    update-manawa-project:
+        docker:
+            - image: marem/circleci-openjdk-oc
 
+        steps:
+            - checkout
 
-workflows:
-    version: 2
-    deploy:
-        jobs:
-            - init-manawa-project
-            - build-sources
-            - docker-build
-        
+            - deploy: 
+                command: |
+                    oc apply -f kubernetes/hello-world-deployment.yml
+                    oc apply -f kubernetes/hello-world-service.yml
+                    oc apply -f kubernetes/hello-world-route.yml
 
 
