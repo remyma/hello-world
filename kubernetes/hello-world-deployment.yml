@@ -1,7 +1,7 @@
 kind: DeploymentConfig
 apiVersion: v1
 metadata:
-  name: hello-world
+  name: marem-helloworld
 spec:
   replicas: 1
   template:
