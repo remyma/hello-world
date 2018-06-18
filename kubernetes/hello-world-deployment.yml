@@ -11,6 +11,8 @@ spec:
           image: devweek-marem/hello-world
           ports:
             - containerPort: 80
+  selector:
+    app: hello-world
   triggers:
     - type: ConfigChange
     - type: ImageChange 
